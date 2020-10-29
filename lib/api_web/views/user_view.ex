@@ -25,4 +25,16 @@ defmodule ApiWeb.UserView do
       }
     }
   end
+
+  def render("sign_up.json", %{user: user, token: token}) do
+    %{
+      data: %{
+        user: %{
+          user_id: user.id,
+          role_id: user.role_id,
+          token: token
+        }
+      }
+    }
+  end
 end

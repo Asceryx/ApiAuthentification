@@ -16,6 +16,8 @@ defmodule ApiWeb.Router do
 
   pipeline :api_auth do
     plug :ensure_authenticated
+    # TODO : A voir la récupération à travers le cookie
+    #plug :ensure_token
   end
 
   scope "/", ApiWeb do
@@ -27,6 +29,8 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through :api
     post "/users/sign_in", UserController, :sign_in
+    post "/users/sign_up", UserController, :sign_up
+    get "/users/sign_out", UserController, :sign_out
   end
 
   scope "/api", ApiWeb do
@@ -57,9 +61,22 @@ defmodule ApiWeb.Router do
     else
       conn
       |> put_status(:unauthorized)
-      |> put_view(MyAppWeb.ErrorView)
+      |> put_view(ApiWeb.ErrorView)
       |> render("401.json", message: "Unauthenticated user")
       |> halt()
+    end
+  end
+
+  defp ensure_token(conn, _opts) do
+    token = conn.assigns.creds.token
+    case Api.Token.verify_and_validate(token) do
+      {:ok, _} -> conn
+      {:error, _} ->
+        conn
+        |> put_status(:unauthorized)
+        |> put_view(ApiWeb.ErrorView)
+        |> render("401.json", message: "Unauthenticated user")
+        |> halt()
     end
   end
 end

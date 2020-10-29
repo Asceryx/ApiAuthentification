@@ -41,7 +41,7 @@ defmodule ApiWeb.UserController do
     end
   end
 
-  @spec sign_in(Plug.Conn.t(), map) :: Plug.Conn.t()
+
   def sign_in(conn, %{"username" => username, "password" => password}) do
     {:ok, token, _} = Api.Token.generate_and_sign()
     case Account.authenticate_user(username, password) do
@@ -60,5 +60,24 @@ defmodule ApiWeb.UserController do
         |> put_view(ApiWeb.ErrorView)
         |> render("401.json", message: message)
     end
+  end
+
+
+  def sign_up(conn, %{"user" => user_params}) do
+    {:ok, token, _} = Api.Token.generate_and_sign()
+    with {:ok, %User{} = user} <- Account.create_user(user_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", Routes.user_path(conn, :show, user))
+      |> render("sign_up.json", user: user, token: token)
+    end
+  end
+
+  def sign_out(conn, _params) do
+    # invalid token = Expiration token = 0
+    expired_token = Api.Token.generate_and_sign(%{"exp" => 0})
+    conn
+    |> put_status(:ok)
+    |> render("sign_out.json", user: {}, token: expired_token)
   end
 end
