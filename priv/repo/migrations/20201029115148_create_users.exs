@@ -8,8 +8,9 @@ defmodule Api.Repo.Migrations.CreateUsers do
       add :username, :string, null: false
       add :password_hash, :string
 
+      add :role_id, references("roles", type: :integer, column: :id)
+
       timestamps()
     end
-
   end
 end

@@ -9,6 +9,12 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+IO.puts("Adding role of users")
+Api.Account.create_role(%{id: 1, name: "user"})
+Api.Account.create_role(%{id: 2, name: "manager"})
+Api.Account.create_role(%{id: 3, name: "admin"})
+
 IO.puts("Adding a couple of users...")
-Api.Account.create_user(%{email: "user1@email.com", password: "qwerty", username: "user1"})
-Api.Account.create_user(%{email: "user2@email.com", password: "asdfgh", username: "user2"})
+Api.Account.create_user(%{email: "user1@email.com", password: "qwerty", username: "user1", role_id: 1})
+Api.Account.create_user(%{email: "user2@email.com", password: "asdfgh", username: "user2", role_id: 1})

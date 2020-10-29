@@ -14,13 +14,13 @@ defmodule ApiWeb.UserView do
     %{id: user.id, email: user.email, username: user.username}
   end
 
-  def render("sign_in.json", %{user: user}) do
+  def render("sign_in.json", %{user: user, token: token}) do
     %{
       data: %{
         user: %{
-          id: user.id,
-          email: user.email,
-          username: user.username
+          user_id: user.id,
+          role_id: user.role_id,
+          token: token
         }
       }
     }

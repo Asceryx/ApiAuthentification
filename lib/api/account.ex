@@ -7,6 +7,7 @@ defmodule Api.Account do
   alias Api.Repo
 
   alias Api.Account.User
+  alias Api.Account.Role
 
   @doc """
   Returns the list of users.
@@ -18,7 +19,10 @@ defmodule Api.Account do
 
   """
   def list_users do
-    Repo.all(User)
+    User
+    |> preload(:role)
+    |> Repo.all()
+
   end
 
   @doc """
@@ -52,6 +56,12 @@ defmodule Api.Account do
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_role(attrs \\ %{}) do
+    %Role{}
+    |> Role.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -107,7 +117,7 @@ defmodule Api.Account do
     query = from(u in User, where: u.username == ^username)
     query |> Repo.one() |> verify_password(password)
   end
-  
+
   defp verify_password(nil, _) do
     Bcrypt.no_user_verify()
     {:error, "Wrong username or password"}
@@ -120,4 +130,6 @@ defmodule Api.Account do
       {:error, "Wrong email or password"}
     end
   end
+
+
 end

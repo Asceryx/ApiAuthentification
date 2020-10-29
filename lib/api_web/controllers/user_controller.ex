@@ -40,8 +40,10 @@ defmodule ApiWeb.UserController do
       send_resp(conn, :no_content, "")
     end
   end
-  
+
+  @spec sign_in(Plug.Conn.t(), map) :: Plug.Conn.t()
   def sign_in(conn, %{"username" => username, "password" => password}) do
+    {:ok, token, _} = Api.Token.generate_and_sign()
     case Account.authenticate_user(username, password) do
       {:ok, user} ->
         conn
@@ -49,7 +51,7 @@ defmodule ApiWeb.UserController do
         |> configure_session(renew: true)
         |> put_status(:ok)
         |> put_view(ApiWeb.UserView)
-        |> render("sign_in.json", user: user)
+        |> render("sign_in.json", user: user, token: token)
 
       {:error, message} ->
         conn
